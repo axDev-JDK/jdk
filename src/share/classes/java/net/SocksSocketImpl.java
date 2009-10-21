@@ -66,6 +66,7 @@ class SocksSocketImpl extends PlainSocketImpl implements SocksConsts {
             // Use getHostString() to avoid reverse lookups
             server = ad.getHostString();
             serverPort = ad.getPort();
+            applicationSetProxy = true;
         }
     }
 
@@ -139,8 +140,7 @@ class SocksSocketImpl extends PlainSocketImpl implements SocksConsts {
                 userName = pw.getUserName();
                 password = new String(pw.getPassword());
             } else {
-                userName = java.security.AccessController.doPrivileged(
-                        new sun.security.action.GetPropertyAction("user.name"));
+                userName = getUserName();
             }
             if (userName == null)
                 return false;
