@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1998, 2006, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1998, 2009, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -33,14 +33,11 @@ import javax.swing.text.JTextComponent;
 
 import java.awt.Component;
 import java.awt.Insets;
-import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Window;
-import java.io.Serializable;
 
 import sun.swing.StringUIClientPropertyKey;
 

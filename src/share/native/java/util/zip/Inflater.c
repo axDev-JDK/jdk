@@ -39,7 +39,7 @@
 #include "java_util_zip_Inflater.h"
 
 #define ThrowDataFormatException(env, msg) \
-        JNU_ThrowByName(env, "java/util/zip/DataFormatException", msg)
+	JNU_ThrowByName(env, "java/util/zip/DataFormatException", msg)
 
 static jfieldID needDictID;
 static jfieldID finishedID;
@@ -61,8 +61,8 @@ Java_java_util_zip_Inflater_init(JNIEnv *env, jclass cls, jboolean nowrap)
     z_stream *strm = calloc(1, sizeof(z_stream));
 
     if (strm == 0) {
-        JNU_ThrowOutOfMemoryError(env, 0);
-        return jlong_zero;
+	JNU_ThrowOutOfMemoryError(env, 0);
+	return jlong_zero;
     } else {
         char *msg;
         switch (inflateInit2(strm, nowrap ? -MAX_WBITS : MAX_WBITS)) {

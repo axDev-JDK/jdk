@@ -88,8 +88,8 @@ ifeq ($(PLATFORM), solaris)
 endif
 
 ifeq ($(PLATFORM), linux)
-  FREE_SPACE := $(shell $(DF) --sync -kP $(OUTPUTDIR) | $(TAIL) -1 | $(NAWK) '{print $$4;}')
-  TEMP_FREE_SPACE := $(shell $(DF) --sync -kP $(TEMP_DISK) | $(TAIL) -1 | $(NAWK) '{print $$4;}')
+  FREE_SPACE := $(shell $(DF) -kP $(OUTPUTDIR) | $(TAIL) -1 | $(NAWK) '{print $$4;}')
+  TEMP_FREE_SPACE := $(shell $(DF) -kP $(TEMP_DISK) | $(TAIL) -1 | $(NAWK) '{print $$4;}')
   # What kind of system we are using (Variation is the Linux vendor)
   OS_VERSION := $(shell uname -r)
   OS_VARIANT_NAME := $(shell \
@@ -99,12 +99,20 @@ ifeq ($(PLATFORM), linux)
       echo "RedHat"; \
     elif [ -f /etc/SuSE-release ] ; then \
       echo "SuSE"; \
+    elif [ -f /etc/gentoo-release ] ; then \
+      echo "Gentoo"; \
+    elif [ -f /etc/debian_version ] ; then \
+      echo "Debian"; \
     else \
       echo "Unknown"; \
     fi)
   OS_VARIANT_VERSION := $(shell \
     if [ "$(OS_VARIANT_NAME)" = "Fedora" ] ; then \
       $(CAT) /etc/fedora-release | $(HEAD) -1 | $(NAWK) '{ print $$3; }' ; \
+    elif [ "$(OS_VARIANT_NAME)" = "Gentoo" ] ; then \
+      $(CAT) /etc/gentoo-release | $(HEAD) -1 | $(NAWK) '{ print $$5; }' ; \
+    elif [ "$(OS_VARIANT_NAME)" = "Debian" ] ; then \
+      $(CAT) /etc/debian_version ; \
     fi)
   ALSA_INCLUDE=/usr/include/alsa/version.h
   ALSA_LIBRARY=/usr/lib/libasound.so
