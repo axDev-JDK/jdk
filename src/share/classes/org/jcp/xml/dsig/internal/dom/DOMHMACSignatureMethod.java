@@ -94,8 +94,6 @@ public abstract class DOMHMACSignatureMethod extends DOMSignatureMethod {
                     "Setting outputLength from HMACParameterSpec to: "
                     + outputLength);
             }
-        } else {
-            outputLength = -1;
         }
     }
 
