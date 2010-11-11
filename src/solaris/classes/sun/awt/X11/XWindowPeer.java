@@ -372,7 +372,7 @@ class XWindowPeer extends XPanelPeer implements WindowPeer,
         if (iconLog.isLoggable(PlatformLogger.FINEST)) {
             iconLog.finest(">>> Sizes of icon images:");
             for (Iterator<XIconInfo> i = icons.iterator(); i.hasNext(); ) {
-                iconLog.finest("    {0}", i.next());
+                iconLog.finest("    {0}", String.valueOf(i.next()));
             }
         }
     }
@@ -789,7 +789,9 @@ class XWindowPeer extends XPanelPeer implements WindowPeer,
     public void handleFocusEvent(XEvent xev) {
         XFocusChangeEvent xfe = xev.get_xfocus();
         FocusEvent fe;
-        focusLog.fine("{0}", xfe);
+        if (focusLog.isLoggable(PlatformLogger.FINER)) {
+            focusLog.fine("{0}", String.valueOf(xfe));
+        }
         if (isEventDisabled(xev)) {
             return;
         }
@@ -1486,7 +1488,10 @@ class XWindowPeer extends XPanelPeer implements WindowPeer,
             synchronized(getStateLock()) {
                 XDialogPeer blockerPeer = (XDialogPeer) AWTAccessor.getComponentAccessor().getPeer(d);
                 if (blocked) {
-                    log.fine("{0} is blocked by {1}", this, blockerPeer);
+                    if (log.isLoggable(PlatformLogger.FINE)) {
+                        log.fine("{0} is blocked by {1}",
+                                 String.valueOf(this), String.valueOf(blockerPeer));
+                    }
                     modalBlocker = d;
 
                     if (isReparented() || XWM.isNonReparentingWM()) {
@@ -2017,7 +2022,8 @@ class XWindowPeer extends XPanelPeer implements WindowPeer,
         XCrossingEvent xce = xev.get_xcrossing();
         if (grabLog.isLoggable(PlatformLogger.FINE)) {
             grabLog.fine("{0}, when grabbed {1}, contains {2}",
-                         xce, isGrabbed(), containsGlobal(xce.get_x_root(), xce.get_y_root()));
+                         String.valueOf(xce), isGrabbed(),
+                         containsGlobal(xce.get_x_root(), xce.get_y_root()));
         }
         if (isGrabbed()) {
             // When window is grabbed, all events are dispatched to
@@ -2028,7 +2034,10 @@ class XWindowPeer extends XPanelPeer implements WindowPeer,
             // since it generates MOUSE_ENTERED/MOUSE_EXITED for frame and dialog.
             // (fix for 6390326)
             XBaseWindow target = XToolkit.windowToXWindow(xce.get_window());
-            grabLog.finer("  -  Grab event target {0}", target);
+            if (grabLog.isLoggable(PlatformLogger.FINER)) {
+                grabLog.finer("  -  Grab event target {0}",
+                              String.valueOf(target));
+            }
             if (target != null && target != this) {
                 target.dispatchEvent(xev);
                 return;
@@ -2041,7 +2050,8 @@ class XWindowPeer extends XPanelPeer implements WindowPeer,
         XMotionEvent xme = xev.get_xmotion();
         if (grabLog.isLoggable(PlatformLogger.FINE)) {
             grabLog.finer("{0}, when grabbed {1}, contains {2}",
-                          xme, isGrabbed(), containsGlobal(xme.get_x_root(), xme.get_y_root()));
+                          String.valueOf(xme), isGrabbed(),
+                          containsGlobal(xme.get_x_root(), xme.get_y_root()));
         }
         if (isGrabbed()) {
             boolean dragging = false;
@@ -2070,7 +2080,9 @@ class XWindowPeer extends XPanelPeer implements WindowPeer,
                 xme.set_x(localCoord.x);
                 xme.set_y(localCoord.y);
             }
-            grabLog.finer("  -  Grab event target {0}", target);
+            if (grabLog.isLoggable(PlatformLogger.FINER)) {
+                grabLog.finer("  -  Grab event target {0}", String.valueOf(target));
+            }
             if (target != null) {
                 if (target != getContentXWindow() && target != this) {
                     target.dispatchEvent(xev);
@@ -2104,7 +2116,9 @@ class XWindowPeer extends XPanelPeer implements WindowPeer,
         }
         if (grabLog.isLoggable(PlatformLogger.FINE)) {
             grabLog.fine("{0}, when grabbed {1}, contains {2} ({3}, {4}, {5}x{6})",
-                         xbe, isGrabbed(), containsGlobal(xbe.get_x_root(), xbe.get_y_root()), getAbsoluteX(), getAbsoluteY(), getWidth(), getHeight());
+                         String.valueOf(xbe), isGrabbed(),
+                         containsGlobal(xbe.get_x_root(), xbe.get_y_root()),
+                         getAbsoluteX(), getAbsoluteY(), getWidth(), getHeight());
         }
         if (isGrabbed()) {
             // When window is grabbed, all events are dispatched to
@@ -2113,7 +2127,10 @@ class XWindowPeer extends XPanelPeer implements WindowPeer,
             // translation)
             XBaseWindow target = XToolkit.windowToXWindow(xbe.get_window());
             try {
-                grabLog.finer("  -  Grab event target {0} (press target {1})", target, pressTarget);
+                if (grabLog.isLoggable(PlatformLogger.FINER)) {
+                    grabLog.finer("  -  Grab event target {0} (press target {1})",
+                                  String.valueOf(target), String.valueOf(pressTarget));
+                }
                 if (xbe.get_type() == XConstants.ButtonPress
                     && xbe.get_button() == XConstants.buttons[0])
                 {
@@ -2147,7 +2164,10 @@ class XWindowPeer extends XPanelPeer implements WindowPeer,
                         // According to the specification of UngrabEvent, post it
                         // when press occurs outside of the window and not on its owned windows
                         if (xbe.get_type() == XConstants.ButtonPress) {
-                            grabLog.fine("Generating UngrabEvent on {0} because not inside of shell", this);
+                            if (grabLog.isLoggable(PlatformLogger.FINE)) {
+                                grabLog.fine("Generating UngrabEvent on {0} because not inside of shell",
+                                             String.valueOf(this));
+                            }
                             postEventToEventQueue(new sun.awt.UngrabEvent(getEventSource()));
                             return;
                         }
@@ -2166,18 +2186,27 @@ class XWindowPeer extends XPanelPeer implements WindowPeer,
                             // toplevel == null - outside of
                             // hierarchy, toplevel is Dialog - should
                             // send ungrab (but shouldn't for Window)
-                            grabLog.fine("Generating UngrabEvent on {0} because hierarchy ended", this);
+                            if (grabLog.isLoggable(PlatformLogger.FINE)) {
+                                grabLog.fine("Generating UngrabEvent on {0} because hierarchy ended",
+                                             String.valueOf(this));
+                            }
                             postEventToEventQueue(new sun.awt.UngrabEvent(getEventSource()));
                         }
                     } else {
                         // toplevel is null - outside of hierarchy
-                        grabLog.fine("Generating UngrabEvent on {0} because toplevel is null", this);
+                        if (grabLog.isLoggable(PlatformLogger.FINE)) {
+                            grabLog.fine("Generating UngrabEvent on {0} because toplevel is null",
+                                         String.valueOf(this));
+                        }
                         postEventToEventQueue(new sun.awt.UngrabEvent(getEventSource()));
                         return;
                     }
                 } else {
                     // target doesn't map to XAWT window - outside of hierarchy
-                    grabLog.fine("Generating UngrabEvent on because target is null {0}", this);
+                    if (grabLog.isLoggable(PlatformLogger.FINE)) {
+                        grabLog.fine("Generating UngrabEvent on because target is null {0}",
+                                     String.valueOf(this));
+                    }
                     postEventToEventQueue(new sun.awt.UngrabEvent(getEventSource()));
                     return;
                 }
