@@ -1815,7 +1815,7 @@ public class ICC_Profile implements Serializable {
                     new StringTokenizer(path, File.pathSeparator);
                 while (st.hasMoreTokens() && ((f == null) || (!f.isFile()))) {
                     dir = st.nextToken();
-                        fullPath = dir + File.separatorChar + fileName;
+                    fullPath = dir + File.separatorChar + fileName;
                     f = new File(fullPath);
                     if (!isChildOf(f, dir)) {
                         f = null;
@@ -1830,7 +1830,7 @@ public class ICC_Profile implements Serializable {
                     new StringTokenizer(path, File.pathSeparator);
                 while (st.hasMoreTokens() && ((f == null) || (!f.isFile()))) {
                     dir = st.nextToken();
-                        fullPath = dir + File.separatorChar + fileName;
+                    fullPath = dir + File.separatorChar + fileName;
                     f = new File(fullPath);
                 }
             }

@@ -31,6 +31,8 @@ import java.io.FileDescriptor;
 import java.security.CodeSigner;
 import java.security.ProtectionDomain;
 
+import java.security.ProtectionDomain;
+
 /** A repository of "shared secrets", which are a mechanism for
     calling implementation-private methods in another package without
     using reflection. A package-private class implements a public
@@ -123,9 +125,10 @@ public class SharedSecrets {
 
     public static JavaSecurityProtectionDomainAccess
         getJavaSecurityProtectionDomainAccess() {
-            if (javaSecurityProtectionDomainAccess == null)
-                unsafe.ensureClassInitialized(ProtectionDomain.class);
-            return javaSecurityProtectionDomainAccess;
+        if (javaSecurityProtectionDomainAccess == null)
+            unsafe.ensureClassInitialized(ProtectionDomain.class);
+
+        return javaSecurityProtectionDomainAccess;
     }
 
     public static void setJavaSecurityCodeSignerAccess

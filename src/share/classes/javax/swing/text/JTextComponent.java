@@ -4053,8 +4053,7 @@ public abstract class JTextComponent extends JComponent implements Scrollable, A
         return modifiers;
     }
 
-    private static final Object KEYMAP_TABLE =
-        new StringBuilder("JTextComponent_KeymapTable");
+    private static final Object KEYMAP_TABLE = new Object(); // JTextComponent_KeymapTable
 
     //
     // member variables used for on-the-spot input method
@@ -4387,8 +4386,7 @@ public abstract class JTextComponent extends JComponent implements Scrollable, A
         }
     }
 
-    private static final Object FOCUSED_COMPONENT =
-        new StringBuilder("JTextComponent_FocusedComponent");
+    private static final Object FOCUSED_COMPONENT = new Object(); // JTextComponent_FocusedComponent
 
     /**
      * The default keymap that will be shared by all
