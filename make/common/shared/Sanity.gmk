@@ -95,6 +95,10 @@ ifeq ($(PLATFORM), linux)
       echo "RedHat"; \
     elif [ -f /etc/SuSE-release ] ; then \
       echo "SuSE"; \
+    elif [ -f /etc/gentoo-release ] ; then \
+      echo "Gentoo"; \
+    elif [ -f /etc/debian_version ] ; then \
+      echo "Debian"; \
     elif [ -f /etc/lsb-release ] ; then \
       $(EGREP) DISTRIB_ID /etc/lsb-release | $(SED) -e 's@.*DISTRIB_ID=\(.*\)@\1@'; \
     else \
@@ -103,6 +107,10 @@ ifeq ($(PLATFORM), linux)
   OS_VARIANT_VERSION := $(shell \
     if [ "$(OS_VARIANT_NAME)" = "Fedora" ] ; then \
       $(CAT) /etc/fedora-release | $(HEAD) -1 | $(NAWK) '{ print $$3; }' ; \
+    elif [ "$(OS_VARIANT_NAME)" = "Gentoo" ] ; then \
+      $(CAT) /etc/gentoo-release | $(HEAD) -1 | $(NAWK) '{ print $$5; }' ; \
+    elif [ "$(OS_VARIANT_NAME)" = "Debian" ] ; then \
+      $(CAT) /etc/debian_version ; \
     elif [ -f /etc/lsb-release ] ; then \
       $(EGREP) DISTRIB_RELEASE /etc/lsb-release | $(SED) -e 's@.*DISTRIB_RELEASE=\(.*\)@\1@'; \
     fi)

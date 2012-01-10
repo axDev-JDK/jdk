@@ -32,7 +32,7 @@
 #include "jlong.h"
 #include "jni.h"
 #include "jni_util.h"
-#include "zlib.h"
+#include <zlib.h>
 
 #include "java_util_zip_Deflater.h"
 
@@ -60,34 +60,34 @@ Java_java_util_zip_Deflater_initIDs(JNIEnv *env, jclass cls)
 
 JNIEXPORT jlong JNICALL
 Java_java_util_zip_Deflater_init(JNIEnv *env, jclass cls, jint level,
-                                 jint strategy, jboolean nowrap)
+				 jint strategy, jboolean nowrap)
 {
     z_stream *strm = calloc(1, sizeof(z_stream));
 
     if (strm == 0) {
-        JNU_ThrowOutOfMemoryError(env, 0);
-        return jlong_zero;
+	JNU_ThrowOutOfMemoryError(env, 0);
+	return jlong_zero;
     } else {
-        char *msg;
-        switch (deflateInit2(strm, level, Z_DEFLATED,
-                             nowrap ? -MAX_WBITS : MAX_WBITS,
-                             DEF_MEM_LEVEL, strategy)) {
-          case Z_OK:
-            return ptr_to_jlong(strm);
-          case Z_MEM_ERROR:
-            free(strm);
-            JNU_ThrowOutOfMemoryError(env, 0);
-            return jlong_zero;
-          case Z_STREAM_ERROR:
-            free(strm);
-            JNU_ThrowIllegalArgumentException(env, 0);
-            return jlong_zero;
-          default:
-            msg = strm->msg;
-            free(strm);
-            JNU_ThrowInternalError(env, msg);
-            return jlong_zero;
-        }
+	char *msg;
+	switch (deflateInit2(strm, level, Z_DEFLATED,
+			     nowrap ? -MAX_WBITS : MAX_WBITS,
+			     DEF_MEM_LEVEL, strategy)) {
+	  case Z_OK:
+	    return ptr_to_jlong(strm);
+	  case Z_MEM_ERROR:
+	    free(strm);
+	    JNU_ThrowOutOfMemoryError(env, 0);
+	    return jlong_zero;
+	  case Z_STREAM_ERROR:
+	    free(strm);
+	    JNU_ThrowIllegalArgumentException(env, 0);
+	    return jlong_zero;
+	  default:
+	    msg = strm->msg;
+	    free(strm);
+	    JNU_ThrowInternalError(env, msg);
+	    return jlong_zero;
+	}
     }
 }
 

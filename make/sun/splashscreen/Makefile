@@ -65,6 +65,18 @@ ifneq ($(PLATFORM), windows)
   CFLAGS += -DWITH_X11
   CPPFLAGS += -I$(OPENWIN_HOME)/include -I$(OPENWIN_HOME)/include/X11/extensions
   OTHER_LDLIBS += -L$(OPENWIN_LIB) -lX11 -lXext $(LIBM) -lpthread
+  ifdef USE_SYSTEM_ZLIB
+    OTHER_LDLIBS += $(ZLIB_LIBS)
+  endif
+  ifdef USE_SYSTEM_JPEG
+    OTHER_LDLIBS += $(JPEG_LIBS)
+  endif
+  ifdef USE_SYSTEM_PNG
+    OTHER_LDLIBS += $(PNG_LIBS)
+  endif
+  ifdef USE_SYSTEM_GIF
+    OTHER_LDLIBS += $(GIF_LIBS)
+  endif
 else # PLATFORM
   CFLAGS += -DWITH_WIN32
   OTHER_LDLIBS += kernel32.lib user32.lib gdi32.lib delayimp.lib /DELAYLOAD:user32.dll
@@ -76,14 +88,41 @@ endif # PLATFORM
 #
 vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)/splashscreen
 vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)
-vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)/giflib
-vpath %.c   $(SHARE_SRC)/native/java/util/zip/zlib-$(ZLIB_VERSION)
-vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)/libpng
-vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)/image/jpeg
+ifndef USE_SYSTEM_GIF
+  vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)/giflib
+endif
+ifndef USE_SYSTEM_ZLIB
+  vpath %.c   $(SHARE_SRC)/native/java/util/zip/zlib-$(ZLIB_VERSION)
+endif
+ifndef USE_SYSTEM_PNG
+  vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)/libpng
+endif
+ifndef USE_SYSTEM_JPEG
+  vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)/image/jpeg/jpeg-6b
+endif
 vpath %.c   $(PLATFORM_SRC)/native/$(PKGDIR)/splashscreen
 
 CPPFLAGS += -I$(PLATFORM_SRC)/native/$(PKGDIR)/splashscreen -I$(SHARE_SRC)/native/$(PKGDIR)/splashscreen
-CPPFLAGS += -I$(SHARE_SRC)/native/$(PKGDIR)/image/jpeg -I$(SHARE_SRC)/native/java/util/zip/zlib-$(ZLIB_VERSION)
+ifdef USE_SYSTEM_JPEG
+  CPPFLAGS += $(JPEG_CFLAGS)
+else
+  CPPFLAGS += -I$(SHARE_SRC)/native/$(PKGDIR)/image/jpeg/jpeg-6b
+endif
+ifdef USE_SYSTEM_ZLIB
+  CPPFLAGS += $(ZLIB_CFLAGS)
+else
+  CPPFLAGS += -I$(SHARE_SRC)/native/java/util/zip/zlib-$(ZLIB_VERSION)
+endif
+ifdef USE_SYSTEM_PNG
+  CPPFLAGS += $(PNG_CFLAGS)
+else
+  CPPFLAGS += -I$(SHARE_SRC)/native/$(PKGDIR)/libpng
+endif
+ifdef USE_SYSTEM_GIF
+  CPPFLAGS += $(GIF_CFLAGS)
+else
+  CPPFLAGS += -I$(SHARE_SRC)/native/$(PKGDIR)/giflib
+endif
 
 # Shun the less than portable MMX assembly code in pnggccrd.c,
 # and use alternative implementations in C.

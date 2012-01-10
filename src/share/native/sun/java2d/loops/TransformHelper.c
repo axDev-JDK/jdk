@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004, 2011, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -405,6 +405,15 @@ Java_sun_java2d_loops_TransformHelper_Transform
             : NULL;
     } else {
         pEdges = edgebuf;
+    }
+    if (pEdges == NULL) {
+        if (numedges > 0) {
+            JNU_ThrowInternalError(env, "Unable to allocate edge list");
+        }
+        SurfaceData_InvokeUnlock(env, dstOps, &dstInfo);
+        SurfaceData_InvokeUnlock(env, srcOps, &srcInfo);
+        /* edgeArray should already contain zeros for min/maxy */
+        return;
     }
 
     if (pEdges == NULL) {

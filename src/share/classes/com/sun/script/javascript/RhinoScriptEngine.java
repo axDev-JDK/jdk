@@ -126,7 +126,7 @@ public final class RhinoScriptEngine extends AbstractScriptEngine
         if (tmp != null) {
             version = Integer.parseInt((String)tmp);
         } else {
-            version = Context.VERSION_1_8;
+            version = Context.VERSION_DEFAULT;
         }
         return version;
     }
@@ -145,6 +145,10 @@ public final class RhinoScriptEngine extends AbstractScriptEngine
      * Creates a new instance of RhinoScriptEngine
      */
     public RhinoScriptEngine() {
+        if (System.getSecurityManager() != null) {
+            accCtxt = AccessController.getContext();
+        }
+
         if (System.getSecurityManager() != null) {
             accCtxt = AccessController.getContext();
         }
