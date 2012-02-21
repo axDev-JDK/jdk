@@ -31,7 +31,7 @@ FILES_c = \
 	ZipFile.c \
 	zip_util.c
 
-ifneq ($(SYSTEM_ZLIB),true)
+ifndef USE_SYSTEM_ZLIB
 FILES_c += \
 	compress.c \
 	deflate.c \

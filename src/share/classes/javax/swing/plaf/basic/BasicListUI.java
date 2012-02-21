@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2007, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2009, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -56,8 +56,7 @@ import javax.swing.plaf.basic.DragRecognitionSupport.BeforeDrag;
  */
 public class BasicListUI extends ListUI
 {
-    private static final StringBuilder BASELINE_COMPONENT_KEY =
-        new StringBuilder("List.baselineComponent");
+    private static final Object BASELINE_COMPONENT_KEY = new Object(); // List.baselineComponent
 
     protected JList list = null;
     protected CellRendererPane rendererPane;

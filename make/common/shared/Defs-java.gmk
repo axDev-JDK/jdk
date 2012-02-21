@@ -121,11 +121,16 @@ ifeq ($(DEBUG_CLASSFILES),true)
   JAVACFLAGS += -g
 endif
 ifeq ($(JAVAC_MAX_WARNINGS), true)
-  JAVACFLAGS  += -Xlint:all
+  JAVAC_LINT_OPTIONS += -Xlint:all
 endif
 ifeq ($(JAVAC_WARNINGS_FATAL), true)
   JAVACFLAGS  += -Werror
 endif
+
+# TODO: Workaround for CR 7063027. Remove -path eventually.
+JAVAC_LINT_OPTIONS += -Xlint:-path
+
+JAVACFLAGS += $(JAVAC_LINT_OPTIONS)
 
 #
 # Some licensees do not get the Security Source bundles.  We will
@@ -216,9 +221,7 @@ endif
 # The javac options supplied to the boot javac is limited. This compiler
 #   should only be used to build the 'make/tools' sources, which are not
 #   class files that end up in the classes directory.
-ifeq ($(JAVAC_MAX_WARNINGS), true)
-  BOOT_JAVACFLAGS  += -Xlint:all
-endif
+BOOT_JAVACFLAGS += $(JAVAC_LINT_OPTIONS)
 ifeq ($(JAVAC_WARNINGS_FATAL), true)
   BOOT_JAVACFLAGS  += -Werror
 endif
@@ -230,9 +233,16 @@ BOOT_JAR_JFLAGS += $(JAR_JFLAGS)
 
 BOOT_JAVACFLAGS  += $(NO_PROPRIETARY_API_WARNINGS)
 
+BOOT_LIB = $(BOOTDIR)/jre/lib/rt.jar
+BOOT_JAVACFLAGS += -bootclasspath $(BOOT_LIB)
+
 BOOT_JAVA_CMD      = $(BOOTDIR)/bin/java $(JAVA_TOOLS_FLAGS)
 BOOT_JAVAC_CMD     = $(BOOTDIR)/bin/javac $(JAVAC_JVM_FLAGS) $(BOOT_JAVACFLAGS)
-BOOT_JAR_CMD       = $(BOOTDIR)/bin/jar
+ifdef ALT_JAR_CMD
+  BOOT_JAR_CMD       = $(ALT_JAR_CMD)
+else
+  BOOT_JAR_CMD       = $(BOOTDIR)/bin/jar
+endif
 BOOT_JARSIGNER_CMD = $(BOOTDIR)/bin/jarsigner
 
 # Various tools we need to run (FIXUP: Are these the right ones?)

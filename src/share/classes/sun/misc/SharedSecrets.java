@@ -139,9 +139,10 @@ public class SharedSecrets {
 
     public static JavaSecurityProtectionDomainAccess
         getJavaSecurityProtectionDomainAccess() {
-            if (javaSecurityProtectionDomainAccess == null)
-                unsafe.ensureClassInitialized(ProtectionDomain.class);
-            return javaSecurityProtectionDomainAccess;
+        if (javaSecurityProtectionDomainAccess == null)
+            unsafe.ensureClassInitialized(ProtectionDomain.class);
+
+        return javaSecurityProtectionDomainAccess;
     }
 
     public static void setJavaSecurityAccess(JavaSecurityAccess jsa) {
