@@ -53,16 +53,18 @@ public class RhinoScriptEngineFactory extends ScriptEngineFactoryBase {
     }
 
     public Object getParameter(String key) {
+        String implVer = ScriptRuntime.getMessage0("implementation.version");
+        String[] parts = implVer.split(" ");
         if (key.equals(ScriptEngine.NAME)) {
             return "javascript";
         } else if (key.equals(ScriptEngine.ENGINE)) {
-            return "Mozilla Rhino";
+            return parts[0];
         } else if (key.equals(ScriptEngine.ENGINE_VERSION)) {
-            return "1.7 release 3 PRERELEASE";
+            return implVer;
         } else if (key.equals(ScriptEngine.LANGUAGE)) {
             return "ECMAScript";
         } else if (key.equals(ScriptEngine.LANGUAGE_VERSION)) {
-            return "1.8";
+            return parts[1];
         } else if (key.equals("THREADING")) {
             return "MULTITHREADED";
         } else {

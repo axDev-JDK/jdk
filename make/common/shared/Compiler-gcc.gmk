@@ -53,21 +53,87 @@ endif
 
 ifeq ($(PLATFORM), linux)
 
+  ifndef BUILD_GCC
+    BUILD_GCC=$(COMPILER_PATH)gcc
+  endif
+
+  ifndef BUILD_CPP
+    BUILD_CPP=$(COMPILER_PATH)g++
+  endif
+
   # Settings specific to Linux
-  CC             = $(COMPILER_PATH)gcc
-  CPP            = $(COMPILER_PATH)gcc -E
+  CC             = $(BUILD_GCC)
+  CPP            = $(BUILD_GCC) -E
   # statically link libstdc++ before C++ ABI is stablized on Linux
-  STATIC_CXX     = true
+  ifneq ($(STATIC_CXX),false)
+    STATIC_CXX     = true
+  endif
   ifeq ($(STATIC_CXX),true)
     # g++ always dynamically links libstdc++, even we use "-Wl,-Bstatic -lstdc++"
     # We need to use gcc to statically link the C++ runtime. gcc and g++ use
     # the same subprocess to compile C++ files, so it is OK to build using gcc.
-    CXX            = $(COMPILER_PATH)gcc
+    CXX            = $(BUILD_GCC)
   else
-    CXX            = $(COMPILER_PATH)g++
+    CXX            = $(BUILD_CPP)
+  endif
+  ifeq ($(ARCH), alpha)
+    # alpha
+    REQUIRED_CC_VER = 3.2
+    REQUIRED_GCC_VER = 3.2.*
+  endif
+  ifeq ($(ARCH), amd64)
+    # amd64
+    REQUIRED_CC_VER = 3.2
+    REQUIRED_GCC_VER = 3.2.*
+  endif
+  ifeq ($(ARCH), arm)
+    # arm
+    REQUIRED_CC_VER = 3.2
+    REQUIRED_GCC_VER = 3.2.*
+  endif
+  ifeq ($(ARCH), i586)
+    # i586
+    REQUIRED_CC_VER = 3.2
+    REQUIRED_GCC_VER = 3.2.1*
+    REQUIRED_GCC_VER_INT = 3.2.1-7a
+  endif
+  ifeq ($(ARCH), ia64)
+    # ia64
+    REQUIRED_CC_VER = 3.2
+    REQUIRED_GCC_VER = 2.9[56789].*
+  endif
+  ifneq ("$(findstring m68k,$(ARCH))", "")
+    # m68k
+    REQUIRED_CC_VER = 3.2
+    REQUIRED_GCC_VER = 3.2.*
+  endif
+  ifneq ("$(findstring mips,$(ARCH))", "")
+    # mips
+    REQUIRED_CC_VER = 3.2
+    REQUIRED_GCC_VER = 3.2.*
+  endif
+  ifneq ("$(findstring parisc,$(ARCH))", "")
+    # mips
+    REQUIRED_CC_VER = 4.4
+    REQUIRED_GCC_VER = 4.4.*
+  endif
+  ifneq ("$(findstring ppc,$(ARCH))", "")
+    # ppc or ppc64
+    REQUIRED_CC_VER = 3.2
+    REQUIRED_GCC_VER = 3.2.*
+  endif
+  ifneq ("$(findstring s390,$(ARCH))", "")
+    # s390 or s390x
+    REQUIRED_CC_VER = 3.2
+    REQUIRED_GCC_VER = 3.2.*
+  endif
+  ifneq ("$(findstring sh,$(ARCH))", "")
+    # sh4*, sh3*
+    REQUIRED_CC_VER = 4.0
+    REQUIRED_GCC_VER = 4.0.*
   endif
   # Option used to create a shared library
-  SHARED_LIBRARY_FLAG = -shared -mimpure-text
+  SHARED_LIBRARY_FLAG = -shared
   SUN_COMP_VER := $(shell $(CC) --verbose 2>&1 )
 
 endif
