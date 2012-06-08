@@ -103,6 +103,14 @@ vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)/../java2d/pipe
 vpath %.cpp $(SHARE_SRC)/native/$(PKGDIR)/image
 vpath %.c   $(PLATFORM_SRC)/native/$(PKGDIR)/robot_child
 
+ifndef USE_SYSTEM_CUPS
+vpath %.c   $(PLATFORM_SRC)/native/common/deps
+endif
+
+ifndef USE_SYSTEM_FONTCONFIG
+vpath %.c   $(PLATFORM_SRC)/native/common/deps/fontconfig2
+endif
+
 #
 # Libraries to link in.
 #
@@ -180,7 +188,17 @@ endif
 # !HEADLESS
 
 OTHER_LDLIBS += $(JVMLIB) $(LIBCXX) \
-                -lawt $(LIBM) $(LIBDL)
+                -lawt $(LIBM)
+
+ifdef USE_SYSTEM_CUPS
+  OTHER_LDLIBS += $(CUPS_LIBS)
+endif
+
+ifdef USE_SYSTEM_FONTCONFIG
+  OTHER_LDLIBS += $(FONTCONFIG_LIBS)
+else
+  OTHER_LDLIBS += $(LIBDL)
+endif
 
 #
 # Sun CC with -Xa misdefines __STDC__ to 0 (zero).
@@ -193,7 +211,24 @@ endif
 #
 # Other extra flags needed for compiling.
 #
-CPPFLAGS += -I$(CUPS_HEADERS_PATH)
+ifdef CUPS_CFLAGS
+  CPPFLAGS += $(CUPS_CFLAGS)
+else
+  CPPFLAGS += -I$(CUPS_HEADERS_PATH)
+endif
+
+ifdef USE_SYSTEM_CUPS
+  CPPFLAGS += -DUSE_SYSTEM_CUPS
+  LDFLAGS += $(CUPS_LIBS)
+else
+  CPPFLAGS += -I$(PLATFORM_SRC)/native/common/deps
+endif
+
+ifdef USE_SYSTEM_FONTCONFIG
+  CPPFLAGS += $(FONTCONFIG_CFLAGS) -DUSE_SYSTEM_FONTCONFIG
+else
+  CPPFLAGS += -I$(PLATFORM_SRC)/native/common/deps/fontconfig2
+endif
 
 ifndef HEADLESS
 CPPFLAGS += -I$(OPENWIN_HOME)/include 
