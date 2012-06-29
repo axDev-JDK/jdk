@@ -137,7 +137,7 @@ setPathEnvironment(char *envstring)
 
 static int ParseLocale(int cat, char ** std_language, char ** std_script,
                        char ** std_country, char ** std_variant, char ** std_encoding) {
-    char temp[64];
+    char *temp;
     char *language = NULL, *country = NULL, *variant = NULL,
          *encoding = NULL;
     char *p, encoding_variant[64];
@@ -186,6 +186,7 @@ static int ParseLocale(int cat, char ** std_language, char ** std_script,
      * <country name>, <encoding name>, and <variant name> are optional.
      */
 
+    temp = (char*) malloc(strlen(lc)+1);
     strcpy(temp, lc);
 #ifdef MACOSX
     free(lc); // malloced memory
@@ -325,6 +326,10 @@ static int ParseLocale(int cat, char ** std_language, char ** std_script,
         }
 #endif
     }
+
+	
+    /* Free temp */
+    free(temp);
 
     return 1;
 }

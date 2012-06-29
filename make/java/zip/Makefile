@@ -77,7 +77,7 @@ endif
 CPPFLAGS += -I$(SHARE_SRC)/native/java/io
 CPPFLAGS += -I$(PLATFORM_SRC)/native/java/io
 
-ifneq ($(SYSTEM_ZLIB),true)
+ifndef USE_SYSTEM_ZLIB
 CPPFLAGS += -I$(SHARE_SRC)/native/java/util/zip/zlib-$(ZLIB_VERSION)
 
 #
@@ -89,8 +89,8 @@ endif
 #
 # Link to JVM library for JVM_Zip* functions
 #
-ifeq ($(SYSTEM_ZLIB),true)
-OTHER_LDLIBS = -lz
+ifdef USE_SYSTEM_ZLIB
+OTHER_LDLIBS = $(ZLIB_LIBS)
 else
 OTHER_LDLIBS = $(JVMLIB)
 endif
