@@ -42,38 +42,13 @@
 #include <string.h>
 #endif
 
-/* Definitions for GIO */
-
-#define G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE "standard::content-type"
-
-typedef void* gpointer;
-typedef struct _GFile GFile;
-typedef struct _GFileInfo GFileInfo;
-typedef struct _GCancellable GCancellable;
-typedef struct _GError GError;
-
-typedef enum {
-  G_FILE_QUERY_INFO_NONE = 0
-} GFileQueryInfoFlags;
-
-typedef void (*g_type_init_func)(void);
-typedef void (*g_object_unref_func)(gpointer object);
-typedef GFile* (*g_file_new_for_path_func)(const char* path);
-typedef GFileInfo* (*g_file_query_info_func)(GFile *file,
-    const char *attributes, GFileQueryInfoFlags flags,
-    GCancellable *cancellable, GError **error);
-typedef char* (*g_file_info_get_content_type_func)(GFileInfo *info);
-
-static g_type_init_func g_type_init;
-static g_object_unref_func g_object_unref;
-static g_file_new_for_path_func g_file_new_for_path;
-static g_file_query_info_func g_file_query_info;
-static g_file_info_get_content_type_func g_file_info_get_content_type;
-
+#ifdef USE_SYSTEM_GIO
+#include <gio/gio.h>
+#else
+#include <gio_fp.h>
+#endif
 
 /* Definitions for GNOME VFS */
-
-typedef int gboolean;
 
 typedef gboolean (*gnome_vfs_init_function)(void);
 typedef const char* (*gnome_vfs_mime_type_from_name_function)
@@ -82,51 +57,28 @@ typedef const char* (*gnome_vfs_mime_type_from_name_function)
 static gnome_vfs_init_function gnome_vfs_init;
 static gnome_vfs_mime_type_from_name_function gnome_vfs_mime_type_from_name;
 
-
 #include "sun_nio_fs_GnomeFileTypeDetector.h"
-
 
 JNIEXPORT jboolean JNICALL
 Java_sun_nio_fs_GnomeFileTypeDetector_initializeGio
     (JNIEnv* env, jclass this)
 {
-    void* gio_handle;
+    jboolean ret;
 
-    gio_handle = dlopen("libgio-2.0.so", RTLD_LAZY);
-    if (gio_handle == NULL) {
-        gio_handle = dlopen("libgio-2.0.so.0", RTLD_LAZY);
-        if (gio_handle == NULL) {
-            return JNI_FALSE;
-        }
-    }
+#ifdef USE_SYSTEM_GIO
+    ret = JNI_TRUE;
+#else
+    ret = gio_init();
+#endif
 
-    g_type_init = (g_type_init_func)dlsym(gio_handle, "g_type_init");
-    (*g_type_init)();
-
-    g_object_unref = (g_object_unref_func)dlsym(gio_handle, "g_object_unref");
-
-    g_file_new_for_path =
-        (g_file_new_for_path_func)dlsym(gio_handle, "g_file_new_for_path");
-
-    g_file_query_info =
-        (g_file_query_info_func)dlsym(gio_handle, "g_file_query_info");
-
-    g_file_info_get_content_type = (g_file_info_get_content_type_func)
-        dlsym(gio_handle, "g_file_info_get_content_type");
-
-
-    if (g_type_init == NULL ||
-        g_object_unref == NULL ||
-        g_file_new_for_path == NULL ||
-        g_file_query_info == NULL ||
-        g_file_info_get_content_type == NULL)
+    // If there was an error initializing GIO, return false immediately
+    if (ret == JNI_FALSE)
     {
-        dlclose(gio_handle);
-        return JNI_FALSE;
+        return ret;
     }
 
-    (*g_type_init)();
-    return JNI_TRUE;
+    g_type_init ();
+    return ret;
 }
 
 JNIEXPORT jbyteArray JNICALL
@@ -138,11 +90,11 @@ Java_sun_nio_fs_GnomeFileTypeDetector_probeUsingGio
     GFileInfo* gfileinfo;
     jbyteArray result = NULL;
 
-    gfile = (*g_file_new_for_path)(path);
-    gfileinfo = (*g_file_query_info)(gfile, G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,
+    gfile = g_file_new_for_path (path);
+    gfileinfo = g_file_query_info (gfile, G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,
         G_FILE_QUERY_INFO_NONE, NULL, NULL);
     if (gfileinfo != NULL) {
-        const char* mime = (*g_file_info_get_content_type)(gfileinfo);
+        const char* mime = g_file_info_get_content_type (gfileinfo);
         if (mime != NULL) {
             jsize len = strlen(mime);
             result = (*env)->NewByteArray(env, len);
@@ -150,9 +102,9 @@ Java_sun_nio_fs_GnomeFileTypeDetector_probeUsingGio
                 (*env)->SetByteArrayRegion(env, result, 0, len, (jbyte*)mime);
             }
         }
-        (*g_object_unref)(gfileinfo);
+        g_object_unref (gfileinfo);
     }
-    (*g_object_unref)(gfile);
+    g_object_unref (gfile);
 
     return result;
 }

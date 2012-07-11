@@ -62,11 +62,13 @@ program_default_rule: all
 program: $(ACTUAL_PROGRAM)
 
 # Work-around for missing processor specific mapfiles
+ifneq (,$(filter $(ARCH), amd64 i586 sparc sparcv9))
 ifndef CROSS_COMPILE_ARCH
   # reuse the mapfiles in the launcher's directory, the same should
   # be applicable to the tool launchers as well.
   FILES_m = $(BUILDDIR)/java/main/java/mapfile-$(ARCH)
   include $(BUILDDIR)/common/Mapfile-vers.gmk
+endif
 endif
 
 include $(JDK_TOPDIR)/make/common/Rules.gmk
@@ -108,6 +110,9 @@ ifneq (,$(findstring $(PLATFORM), linux solaris)) # UNIX systems
     endif # ARCH_DATA_MODEL
   endif # PLATFORM SOLARIS
   ifeq ($(PLATFORM), linux)
+    ifdef USE_SYSTEM_ZLIB
+      OTHER_LDLIBS += $(ZLIB_LIBS)
+    endif
     LDFLAGS += $(LDFLAG_Z_ORIGIN)
     LDFLAGS += -Wl,--allow-shlib-undefined
     LDFLAGS += -Wl,-rpath -Wl,\$$ORIGIN/../lib/$(LIBARCH)/jli
@@ -358,13 +363,16 @@ ifeq ($(HAVE_GETHRTIME),true)
 endif
 
 OTHER_INCLUDES += -I$(LAUNCHER_SHARE_SRC)/bin -I$(LAUNCHER_PLATFORM_SRC)/bin
+
 ifeq ($(PLATFORM), macosx)
   OTHER_INCLUDES += -I$(LAUNCHER_SOLARIS_PLATFORM_SRC)/bin
   ifneq ($(SYSTEM_ZLIB), true)
     OTHER_INCLUDES += -I$(SHARE_SRC)/native/java/util/zip/zlib-1.1.3
   endif # SYSTEM_ZLIB
 else # PLATFORM !MACOSX
-  OTHER_INCLUDES += -I$(SHARE_SRC)/native/java/util/zip/zlib-1.1.3
+  ifndef USE_SYSTEM_ZLIB
+    OTHER_INCLUDES += -I$(SHARE_SRC)/native/java/util/zip/zlib-1.1.3
+  endif
 endif
 
 OTHER_CPPFLAGS  += -DPROGNAME='"$(PROGRAM)"'
