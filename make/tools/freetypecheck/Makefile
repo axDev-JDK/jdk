@@ -53,7 +53,7 @@ else
     ifeq ($(PLATFORM), macosx)
       FT_LD_OPTIONS += -lfreetype -lz
     else # linux
-      FT_LD_OPTIONS += -Wl,-rpath -Wl,$(FREETYPE_LIB_PATH) -lfreetype
+      FT_LD_OPTIONS += -Wl,-rpath -Wl,$(FREETYPE_LIB_PATH) $(FT2_LIBS)
     endif
   endif
 endif
