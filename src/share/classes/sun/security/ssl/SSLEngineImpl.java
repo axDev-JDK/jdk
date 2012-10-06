@@ -512,6 +512,9 @@ final public class SSLEngineImpl extends SSLEngine {
         if (handshaker != null) {
             handshaker.checkThrown();
         }
+
+        // reset the flag of the first application record
+        isFirstAppOutputRecord = true;
     }
 
     //
@@ -1283,6 +1286,14 @@ final public class SSLEngineImpl extends SSLEngine {
         // eventually compress as well.
         HandshakeStatus hsStatus =
                 writer.writeRecord(eor, ea, writeMAC, writeCipher);
+
+        /*
+         * turn off the flag of the first application record if we really
+         * consumed at least byte.
+         */
+        if (isFirstAppOutputRecord && ea.deltaApp() > 0) {
+            isFirstAppOutputRecord = false;
+        }
 
         /*
          * We only need to check the sequence number state for

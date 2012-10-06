@@ -580,6 +580,8 @@ final class XWM
         return isNetWMName("Mutter");
     }
 
+    // TODO: according to wikipedia, compiz is now reparenting. This should
+    // probably be updated.
     static boolean isNonReparentingWM() {
         return (XWM.getWMID() == XWM.COMPIZ_WM || XWM.getWMID() == XWM.LG3D_WM || XWM.getWMID() == XWM.CWM_WM);
     }
@@ -754,7 +756,7 @@ final class XWM
             } else if (isSawfish()) {
                 awt_wmgr = XWM.SAWFISH_WM;
             } else if (isKDE2()) {
-                awt_wmgr =XWM.KDE2_WM;
+                awt_wmgr = XWM.KDE2_WM;
             } else if (isCompiz()) {
                 awt_wmgr = XWM.COMPIZ_WM;
             } else if (isLookingGlass()) {
@@ -1054,6 +1056,8 @@ final class XWM
 
     boolean supportsDynamicLayout() {
         int wm = getWMID();
+        // TODO: does mutter support this? It's a fancy new WM, so it probably
+        // does. Confirm and fix this.
         switch (wm) {
           case XWM.ENLIGHTEN_WM:
           case XWM.KDE2_WM:
@@ -1378,6 +1382,7 @@ final class XWM
                 return insets;
             }
         }
+        // TODO: figure out if Mutter implements the insets property.
         switch(getWMID()) {
           case XWM.KDE2_WM:
               return getInsetsFromProp(window, XA_KDE_NET_WM_FRAME_STRUT);
@@ -1572,6 +1577,9 @@ final class XWM
                       correctWM.bottom = correctWM.left;
                       break;
                   }
+                  case XWM.MUTTER_WM:
+                      // TODO: Figure out if Mutter is double reparenting.
+                      // For now the fallback code is good enough.
                   case XWM.OTHER_WM:
                   default: {                /* this is very similar to the E! case above */
                       insLog.finest("Getting correct insets for OTHER_WM/default, parent: {0}", parent);
