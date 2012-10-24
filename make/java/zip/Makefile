@@ -81,7 +81,7 @@ endif
 CPPFLAGS += -I$(SHARE_SRC)/native/java/io
 CPPFLAGS += -I$(PLATFORM_SRC)/native/java/io
 
-ifneq ($(SYSTEM_ZLIB),true)
+ifndef USE_SYSTEM_ZLIB
 CPPFLAGS += -I$(SHARE_SRC)/native/java/util/zip/zlib-$(ZLIB_VERSION)
 
 #

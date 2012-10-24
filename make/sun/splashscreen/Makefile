@@ -103,12 +103,18 @@ endif # PLATFORM
 #
 vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)/splashscreen
 vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)
-vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)/giflib
-ifneq ($(SYSTEM_ZLIB),true)
+ifndef USE_SYSTEM_GIF
+  vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)/giflib
+endif
+ifndef USE_SYSTEM_ZLIB
   vpath %.c   $(SHARE_SRC)/native/java/util/zip/zlib-$(ZLIB_VERSION)
 endif
-vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)/libpng
-vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)/image/jpeg
+ifndef USE_SYSTEM_PNG
+  vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)/libpng
+endif
+ifndef USE_SYSTEM_JPEG
+  vpath %.c   $(SHARE_SRC)/native/$(PKGDIR)/image/jpeg/jpeg-6b
+endif
 ifneq ($(PLATFORM), macosx)
   vpath %.c   $(PLATFORM_SRC)/native/$(PKGDIR)/splashscreen
 else
@@ -122,12 +128,33 @@ else
   CPPFLAGS += $(call NativeSrcDirList,-I,/native/sun/osxapp)
 endif
 CPPFLAGS += -I$(SHARE_SRC)/native/$(PKGDIR)/splashscreen
-CPPFLAGS += -I$(SHARE_SRC)/native/$(PKGDIR)/image/jpeg
+
 ifneq ($(SYSTEM_ZLIB),true)
-  CPPFLAGS += -I$(SHARE_SRC)/native/java/util/zip/zlib-$(ZLIB_VERSION)
-else
   OTHER_CFLAGS += $(ZLIB_CFLAGS)
   OTHER_LDLIBS += $(ZLIB_LIBS)
+else
+  CPPFLAGS += -I$(SHARE_SRC)/native/java/util/zip/zlib-$(ZLIB_VERSION)
+endif
+
+ifdef USE_SYSTEM_JPEG
+  CPPFLAGS += $(JPEG_CFLAGS)
+  OTHER_LDLIBS += $(JPEG_LIBS)
+else
+  CPPFLAGS += -I$(SHARE_SRC)/native/$(PKGDIR)/image/jpeg/jpeg-6b
+endif
+
+ifdef USE_SYSTEM_PNG
+  CPPFLAGS += $(PNG_CFLAGS)
+  OTHER_LDLIBS += $(PNG_LIBS)
+else
+  CPPFLAGS += -I$(SHARE_SRC)/native/$(PKGDIR)/libpng
+endif
+
+ifdef USE_SYSTEM_GIF
+  CPPFLAGS += $(GIF_CFLAGS)
+  OTHER_LDLIBS += $(GIF_LIBS)
+else
+  CPPFLAGS += -I$(SHARE_SRC)/native/$(PKGDIR)/giflib
 endif
 
 # Shun the less than portable MMX assembly code in pnggccrd.c,

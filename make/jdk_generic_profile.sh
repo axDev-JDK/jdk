@@ -2,6 +2,7 @@
 
 #
 # Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright 2011 Red Hat, Inc.
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 #
 # This code is free software; you can redistribute it and/or modify it
@@ -258,13 +259,14 @@ if [ "${ZERO_BUILD}" = true ] ; then
     i?86)    ZERO_LIBARCH=i386      ;;
     sparc64) ZERO_LIBARCH=sparcv9   ;;
     arm*)    ZERO_LIBARCH=arm       ;;
+    sh*)     ZERO_LIBARCH=sh        ;;
     *)       ZERO_LIBARCH="$(arch)"
   esac
   export ZERO_LIBARCH
 
   # ARCH_DATA_MODEL is the number of bits in a pointer
   case "${ZERO_LIBARCH}" in
-    i386|ppc|s390|sparc|arm)
+    i386|ppc|s390|sparc|arm|sh)
       ARCH_DATA_MODEL=32
       ;;
     amd64|ppc64|s390x|sparcv9|ia64|alpha)
@@ -379,6 +381,24 @@ if [ "${ZERO_BUILD}" = true ] ; then
   fi
 fi
 
+# Export variables for system LCMS
+# LCMS_CFLAGS and LCMS_LIBS tell the compiler how to compile and
+# link against lcms2
+pkgconfig=$(which pkg-config 2>/dev/null)
+if [ -x "${pkgconfig}" ] ; then
+  if [ "${LCMS_CFLAGS}" = "" ] ; then
+    LCMS_CFLAGS=$("${pkgconfig}" --cflags lcms2)
+  fi
+  if [ "${LCMS_LIBS}" = "" ] ; then
+    LCMS_LIBS=$("${pkgconfig}" --libs lcms2)
+  fi
+fi
+if [ "${LCMS_LIBS}" = "" ] ; then
+    LCMS_LIBS="-llcms2"
+fi
+export LCMS_CFLAGS
+export LCMS_LIBS
+
 # Export variables for system zlib
 # ZLIB_CFLAGS and ZLIB_LIBS tell the compiler how to compile and
 # link against zlib
@@ -397,3 +417,43 @@ fi
 export ZLIB_CFLAGS
 export ZLIB_LIBS
 
+# Export variables for system jpeg
+# JPEG_CFLAGS and JPEG_LIBS tell the compiler how to compile and
+# link against libjpeg
+if [ "${JPEG_LIBS}" = "" ] ; then
+    JPEG_LIBS="-ljpeg"
+fi
+export JPEG_LIBS
+
+# Export variables for system libpng
+# PNG_CFLAGS and PNG_LIBS tell the compiler how to compile and
+# link against libpng
+pkgconfig=$(which pkg-config 2>/dev/null)
+if [ -x "${pkgconfig}" ] ; then
+  if [ "${PNG_CFLAGS}" = "" ] ; then
+    PNG_CFLAGS=$("${pkgconfig}" --cflags libpng)
+  fi
+  if [ "${PNG_LIBS}" = "" ] ; then
+    PNG_LIBS=$("${pkgconfig}" --libs libpng)
+  fi
+fi
+if [ "${PNG_LIBS}" = "" ] ; then
+    PNG_LIBS="-lpng"
+fi
+export PNG_CFLAGS
+export PNG_LIBS
+
+# Export variables for system giflib
+# GIF_CFLAGS and GIF_LIBS tell the compiler how to compile and
+# link against giflib
+if [ "${GIF_LIBS}" = "" ] ; then
+    GIF_LIBS="-lgif"
+fi
+export GIF_LIBS
+
+# IcedTea defaults; use system libraries
+export USE_SYSTEM_LCMS=true
+export USE_SYSTEM_ZLIB=true
+export USE_SYSTEM_JPEG=true
+export USE_SYSTEM_PNG=true
+export USE_SYSTEM_GIF=true
