@@ -449,7 +449,7 @@ getAllConfigs (JNIEnv *env, int screen, AwtScreenDataPtr screenDataPtr) {
         if (xrenderLibHandle != NULL) {
             xrenderFindVisualFormat =
                 (XRenderFindVisualFormatFunc*)dlsym(xrenderLibHandle,
-                                                    "XRenderFindVisualFormat");
+						    "XRenderFindVisualFormat");
         }
     }
 

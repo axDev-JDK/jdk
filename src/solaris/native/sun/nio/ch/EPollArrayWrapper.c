@@ -40,7 +40,6 @@
   } while((_result == -1) && (errno == EINTR)); \
 } while(0)
 
-
 static int
 iepoll(int epfd, struct epoll_event *events, int numfds, jlong timeout)
 {

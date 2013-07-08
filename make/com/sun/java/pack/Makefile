@@ -75,7 +75,7 @@ ifeq ($(STANDALONE),true)
   OTHER_CXXFLAGS += $(ZINCLUDE)
   LDDFLAGS += $(ZIPOBJS)
  else
-  LDDFLAGS += $(ZLIB_LIBS)
+  OTHER_LDLIBS += $(ZLIB_LIBS)
   OTHER_CXXFLAGS += $(ZLIB_CFLAGS) -DSYSTEM_ZLIB
  endif
 else
@@ -99,8 +99,7 @@ ifeq ($(PLATFORM), windows)
   RES = $(OBJDIR)/$(PGRM).res
 else
   LDOUTPUT = -o #Have a space 
-  LDDFLAGS += -lc
-  OTHER_LDLIBS  += $(LIBCXX)
+  OTHER_LDLIBS  += -lc $(LIBCXX)
 # setup the list of libraries to link in...
 ifeq ($(PLATFORM), linux)
 ifeq ("$(CC_VER_MAJOR)", "3")
@@ -157,7 +156,7 @@ $(UNPACK_EXE): $(UNPACK_EXE_FILES_o) updatefiles winres
 	$(prep-target)
 	$(RM) $(TEMPDIR)/mapfile-vers
 	$(CP) mapfile-vers-unpack200 $(TEMPDIR)/mapfile-vers
-	$(LINKER)  $(LDDFLAGS) $(UNPACK_EXE_FILES_o) $(RES) $(LIBCXX) $(LDOUTPUT)$(TEMPDIR)/unpack200$(EXE_SUFFIX)
+	$(LINKER)  $(LDDFLAGS) $(UNPACK_EXE_FILES_o) $(RES) $(OTHER_LDLIBS) $(LDOUTPUT)$(TEMPDIR)/unpack200$(EXE_SUFFIX)
 ifdef MT
 	$(MT) /manifest $(OBJDIR)/unpack200$(EXE_SUFFIX).manifest /outputresource:$(TEMPDIR)/unpack200$(EXE_SUFFIX);#1
 endif

@@ -62,11 +62,13 @@ program_default_rule: all
 program: $(ACTUAL_PROGRAM)
 
 # Work-around for missing processor specific mapfiles
+ifneq (,$(filter $(ARCH), amd64 i586 sparc sparcv9))
 ifndef CROSS_COMPILE_ARCH
   # reuse the mapfiles in the launcher's directory, the same should
   # be applicable to the tool launchers as well.
   FILES_m = $(BUILDDIR)/java/main/java/mapfile-$(ARCH)
   include $(BUILDDIR)/common/Mapfile-vers.gmk
+endif
 endif
 
 include $(JDK_TOPDIR)/make/common/Rules.gmk
@@ -124,6 +126,26 @@ ifeq ($(PLATFORM), windows)
   endif # STATIC_JLI
   OTHER_LDLIBS += jli.lib
 endif # PLATFORM
+
+#
+# Applications expect to be able to link against libjawt without invoking
+# System.loadLibrary("jawt") first. This was the behaviour described in the
+# devloper documentation of JAWT and what worked with OpenJDK6.
+#
+ifeq ($(PLATFORM), solaris)
+  ifeq ($(ARCH_DATA_MODEL), 32)
+    LDFLAGS += -R \$$ORIGIN/../lib/$(LIBARCH)
+    LDFLAGS += -R \$$ORIGIN/../jre/lib/$(LIBARCH)
+  else # ! ARCH_DATA_MODEL 64-bit
+    LDFLAGS += -R \$$ORIGIN/../../lib/$(LIBARCH)
+    LDFLAGS += -R \$$ORIGIN/../../jre/lib/$(LIBARCH)
+  endif # ARCH_DATA_MODEL
+endif # PLATFORM SOLARIS
+ifeq ($(PLATFORM), linux)
+  LDFLAGS += -Wl,-rpath -Wl,\$$ORIGIN/../lib/$(LIBARCH)
+  LDFLAGS += -Wl,-rpath -Wl,\$$ORIGIN/../jre/lib/$(LIBARCH)
+endif # PLATFORM LINUX
+
 
 #
 # Launcher specific files.
@@ -250,7 +272,8 @@ else # *NIXES
   ifneq ($(PLATFORM), macosx)
     ifeq ($(ENABLE_FULL_DEBUG_SYMBOLS),1)
       ifeq ($(PROGRAM_SUPPORTS_FULL_DEBUG_SYMBOLS),1)
-        ifeq ($(PLATFORM), solaris)
+        ifneq ($(STRIP_POLICY),no_strip)
+          ifeq ($(PLATFORM), solaris)
 # gobjcopy crashes on "empty" section headers with the SHF_ALLOC flag set.
 # Use $(FIX_EMPTY_SEC_HDR_FLAGS) to clear the SHF_ALLOC flag (if set) from
 # empty section headers until a fixed $(OBJCOPY) is available.
@@ -260,19 +283,20 @@ else # *NIXES
 #
 # $(OBJCOPY) --add-gnu-debuglink=... corrupts SUNW_* sections.
 # Use $(ADD_GNU_DEBUGLINK) until a fixed $(OBJCOPY) is available.
-	(set -e ; \
-	 $(CD) $(@D) ; \
-	 $(FIX_EMPTY_SEC_HDR_FLAGS) $(@F) ; \
-	 $(OBJCOPY) --only-keep-debug $(@F) $(@F).debuginfo ; \
-         $(ADD_GNU_DEBUGLINK) $(@F).debuginfo $(@F) ; \
-	)
-        else # PLATFORM != solaris
-	(set -e ; \
-	 $(CD) $(@D) ; \
-	 $(OBJCOPY) --only-keep-debug $(@F) $(@F).debuginfo ; \
-	 $(OBJCOPY) --add-gnu-debuglink=$(@F).debuginfo $(@F) ; \
-	)
-        endif # PLATFORM == solaris
+	  (set -e ; \
+	   $(CD) $(@D) ; \
+	   $(FIX_EMPTY_SEC_HDR_FLAGS) $(@F) ; \
+	   $(OBJCOPY) --only-keep-debug $(@F) $(@F).debuginfo ; \
+           $(ADD_GNU_DEBUGLINK) $(@F).debuginfo $(@F) ; \
+	  )
+          else # PLATFORM != solaris
+	  (set -e ; \
+	   $(CD) $(@D) ; \
+	   $(OBJCOPY) --only-keep-debug $(@F) $(@F).debuginfo ; \
+	   $(OBJCOPY) --add-gnu-debuglink=$(@F).debuginfo $(@F) ; \
+	  )
+          endif # PLATFORM == solaris
+        endif
         ifeq ($(STRIP_POLICY),all_strip)
 	  $(STRIP) $@
         else
@@ -286,17 +310,19 @@ else # *NIXES
           # implied else here is no stripping at all
           endif
         endif
-        ifeq ($(ZIP_DEBUGINFO_FILES),1)
-	  (set -e ; \
-	   $(CD) $(@D) ; \
-	   $(ZIPEXE) -q $(@F).diz $(@F).debuginfo ; \
-	   $(RM) $(@F).debuginfo ; \
-	  )
-          # save ZIP'ed debug info with rest of the program's build artifacts
-	  $(MV) $@.diz $(OBJDIR)
-        else
-          # save debug info with rest of the program's build artifacts
-	  $(MV) $@.debuginfo $(OBJDIR)
+        ifneq ($(STRIP_POLICY),no_strip)
+          ifeq ($(ZIP_DEBUGINFO_FILES),1)
+	    (set -e ; \
+	     $(CD) $(@D) ; \
+	     $(ZIPEXE) -q $(@F).diz $(@F).debuginfo ; \
+	     $(RM) $(@F).debuginfo ; \
+	    )
+            # save ZIP'ed debug info with rest of the program's build artifacts
+	    $(MV) $@.diz $(OBJDIR)
+          else
+            # save debug info with rest of the program's build artifacts
+	    $(MV) $@.debuginfo $(OBJDIR)
+          endif
         endif
       endif # PROGRAM_SUPPORTS_FULL_DEBUG_SYMBOLS
     endif # ENABLE_FULL_DEBUG_SYMBOLS
@@ -363,7 +389,9 @@ ifeq ($(PLATFORM), macosx)
     OTHER_INCLUDES += -I$(SHARE_SRC)/native/java/util/zip/zlib-1.1.3
   endif # SYSTEM_ZLIB
 else # PLATFORM !MACOSX
-  OTHER_INCLUDES += -I$(SHARE_SRC)/native/java/util/zip/zlib-1.1.3
+  ifneq ($(SYSTEM_ZLIB), true)
+    OTHER_INCLUDES += -I$(SHARE_SRC)/native/java/util/zip/zlib-1.1.3
+  endif
 endif
 
 OTHER_CPPFLAGS  += -DPROGNAME='"$(PROGRAM)"'

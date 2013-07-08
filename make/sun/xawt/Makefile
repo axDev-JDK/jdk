@@ -102,15 +102,51 @@ vpath %.c   $(SHARE_SRC)/native/sun/java2d/opengl
 vpath %.c   $(PLATFORM_SRC)/native/sun/java2d/opengl
 vpath %.c   $(PLATFORM_SRC)/native/sun/java2d/x11
 
+ifndef USE_SYSTEM_GIO
+vpath %.c   $(PLATFORM_SRC)/native/common/deps/glib2
+endif
+
+ifndef USE_SYSTEM_GTK
+vpath %.c   $(PLATFORM_SRC)/native/common/deps/gtk2
+endif
+
+ifndef USE_SYSTEM_CUPS
+vpath %.c   $(PLATFORM_SRC)/native/common/deps
+endif
+
+ifndef USE_SYSTEM_FONTCONFIG
+vpath %.c   $(PLATFORM_SRC)/native/common/deps/fontconfig2
+endif
+
 OTHER_LDLIBS = $(LIBM) -lawt -lXext -lX11 -lXrender $(LIBDL) \
                    $(LDFLAGS_COMMON) $(AWT_RUNPATH) $(OTHER_LDFLAGS) -lXtst -lXi
+
+ifdef USE_SYSTEM_GTK
+  OTHER_LDLIBS += $(GTK_LIBS)
+endif
+
+ifdef USE_SYSTEM_CUPS
+  OTHER_LDLIBS += $(CUPS_LIBS)
+endif
+
+ifdef USE_SYSTEM_FONTCONFIG
+  OTHER_LDLIBS += $(FONTCONFIG_LIBS)
+endif
+
+ifdef USE_SYSTEM_GIO
+  OTHER_LDLIBS += $(GIO_LIBS)
+endif
 
 ifeq  ($(PLATFORM), solaris)
 CPPFLAGS += -DFUNCPROTO=15
 dummy := $(shell $(MKDIR) -p $(LIB_LOCATION))
 endif
 
-CPPFLAGS += -I$(CUPS_HEADERS_PATH)
+ifdef CUPS_CFLAGS
+  CPPFLAGS += $(CUPS_CFLAGS)
+else
+  CPPFLAGS += -I$(CUPS_HEADERS_PATH)
+endif
 
 CPPFLAGS += -DXAWT -DXAWT_HACK \
         -I$(TEMPDIR)/../../sun.awt/awt/CClassHeaders \
@@ -137,6 +173,30 @@ CPPFLAGS += -DXAWT -DXAWT_HACK \
         -I$(PLATFORM_SRC)/native/sun/font \
         -I$(SHARE_SRC)/native/sun/awt \
         -I$(PLATFORM_SRC)/native/sun/awt
+
+ifdef USE_SYSTEM_GTK
+  CPPFLAGS += $(GTK_CFLAGS) -DUSE_SYSTEM_GTK
+else
+  CPPFLAGS += -I$(PLATFORM_SRC)/native/common/deps/gtk2
+endif
+
+ifdef USE_SYSTEM_CUPS
+  CPPFLAGS += -DUSE_SYSTEM_CUPS
+else
+  CPPFLAGS += -I$(PLATFORM_SRC)/native/common/deps
+endif
+
+ifdef USE_SYSTEM_FONTCONFIG
+  CPPFLAGS += $(FONTCONFIG_CFLAGS) -DUSE_SYSTEM_FONTCONFIG
+else
+  CPPFLAGS += -I$(PLATFORM_SRC)/native/common/deps/fontconfig2
+endif
+
+ifdef USE_SYSTEM_GIO
+  CPPFLAGS += $(GIO_CFLAGS) -DUSE_SYSTEM_GIO
+else
+  CPPFLAGS += -I$(PLATFORM_SRC)/native/common/deps/glib2
+endif
 
 ifeq ($(PLATFORM), linux)
   ifndef CROSS_COMPILE_ARCH

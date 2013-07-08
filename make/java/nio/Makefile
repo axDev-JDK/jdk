@@ -31,7 +31,7 @@ BUILDDIR = ../..
 PACKAGE = java.nio
 LIBRARY = nio
 PRODUCT = java
-OTHER_JAVACFLAGS += -Xmaxwarns 1000 -Xlint:serial -Werror
+OTHER_JAVACFLAGS += -Xmaxwarns 1000 -Xlint:serial
 include $(BUILDDIR)/common/Defs.gmk
 
 NIO_SRC = $(SHARE_SRC)/classes/java/nio
@@ -47,87 +47,6 @@ SNIO_GEN = $(GENSRCDIR)/sun/nio
 include FILES_java.gmk
 include FILES_c.gmk
 include Exportedfiles.gmk
-
-ifeq ($(PLATFORM), solaris)
-FILES_java += \
-        sun/nio/ch/AbstractPollSelectorImpl.java \
-	sun/nio/ch/DevPollArrayWrapper.java \
-	sun/nio/ch/DevPollSelectorImpl.java \
-        sun/nio/ch/DevPollSelectorProvider.java \
-	sun/nio/ch/EventPortSelectorImpl.java \
-	sun/nio/ch/EventPortSelectorProvider.java \
-	sun/nio/ch/EventPortWrapper.java \
-	sun/nio/ch/InheritedChannel.java \
-        sun/nio/ch/PollSelectorProvider.java \
-        sun/nio/ch/PollSelectorImpl.java \
-	sun/nio/ch/Port.java \
-	sun/nio/ch/SimpleAsynchronousFileChannelImpl.java \
-	sun/nio/ch/SolarisAsynchronousChannelProvider.java \
-	sun/nio/ch/SolarisEventPort.java \
-	sun/nio/ch/UnixAsynchronousServerSocketChannelImpl.java \
-	sun/nio/ch/UnixAsynchronousSocketChannelImpl.java \
-	\
-	sun/nio/fs/GnomeFileTypeDetector.java \
-	sun/nio/fs/PollingWatchService.java \
-	sun/nio/fs/SolarisAclFileAttributeView.java \
-	sun/nio/fs/SolarisFileStore.java \
-	sun/nio/fs/SolarisFileSystem.java \
-	sun/nio/fs/SolarisFileSystemProvider.java \
-	sun/nio/fs/SolarisUserDefinedFileAttributeView.java \
-	sun/nio/fs/SolarisNativeDispatcher.java \
-	sun/nio/fs/SolarisWatchService.java \
-	sun/nio/fs/UnixChannelFactory.java \
-	sun/nio/fs/UnixCopyFile.java \
-	sun/nio/fs/UnixDirectoryStream.java \
-	sun/nio/fs/UnixException.java \
-	sun/nio/fs/UnixFileAttributeViews.java \
-	sun/nio/fs/UnixFileAttributes.java \
-	sun/nio/fs/UnixFileKey.java \
-	sun/nio/fs/UnixFileModeAttribute.java \
-	sun/nio/fs/UnixFileStore.java \
-	sun/nio/fs/UnixFileStoreAttributes.java \
-	sun/nio/fs/UnixFileSystem.java \
-	sun/nio/fs/UnixFileSystemProvider.java \
-	sun/nio/fs/UnixMountEntry.java \
-	sun/nio/fs/UnixNativeDispatcher.java \
-	sun/nio/fs/UnixPath.java \
-	sun/nio/fs/UnixSecureDirectoryStream.java \
-	sun/nio/fs/UnixUriUtils.java \
-	sun/nio/fs/UnixUserPrincipals.java
-
-FILES_c += \
-        DevPollArrayWrapper.c \
-	InheritedChannel.c \
-	NativeThread.c \
-        PollArrayWrapper.c \
-	SolarisEventPort.c \
-	UnixAsynchronousServerSocketChannelImpl.c \
-	UnixAsynchronousSocketChannelImpl.c \
-	\
-	GnomeFileTypeDetector.c \
-	SolarisNativeDispatcher.c \
-	SolarisWatchService.c \
-	UnixCopyFile.c \
-	UnixNativeDispatcher.c
-
-FILES_export += \
-	sun/nio/ch/DevPollArrayWrapper.java \
-	sun/nio/ch/InheritedChannel.java \
-	sun/nio/ch/NativeThread.java \
-	sun/nio/ch/SolarisEventPort.java \
-	sun/nio/ch/UnixAsynchronousServerSocketChannelImpl.java \
-	sun/nio/ch/UnixAsynchronousSocketChannelImpl.java \
-	\
-	sun/nio/fs/GnomeFileTypeDetector.java \
-	sun/nio/fs/SolarisNativeDispatcher.java \
-	sun/nio/fs/SolarisWatchService.java \
-	sun/nio/fs/UnixCopyFile.java \
-	sun/nio/fs/UnixNativeDispatcher.java
-
-FILES_gen += \
-	sun/nio/fs/SolarisConstants.java \
-	sun/nio/fs/UnixConstants.java
-endif # PLATFORM = solaris
 
 ifeq ($(PLATFORM), windows)
 FILES_java += \
@@ -164,15 +83,6 @@ FILES_java += \
 	sun/nio/fs/WindowsUserPrincipals.java \
 	sun/nio/fs/WindowsWatchService.java
 
-FILES_c += \
-	Iocp.c \
-	RegistryFileTypeDetector.c \
-	WindowsAsynchronousFileChannelImpl.c \
-	WindowsAsynchronousServerSocketChannelImpl.c \
-	WindowsAsynchronousSocketChannelImpl.c \
-	WindowsNativeDispatcher.c \
-        WindowsSelectorImpl.c
-
 FILES_export += \
 	sun/nio/ch/Iocp.java \
 	sun/nio/ch/WindowsAsynchronousFileChannelImpl.java \
@@ -181,11 +91,14 @@ FILES_export += \
 	sun/nio/ch/WindowsSelectorImpl.java \
 	sun/nio/fs/WindowsNativeDispatcher.java \
 	sun/nio/fs/RegistryFileTypeDetector.java
-endif # PLATFORM = windows
 
-ifeq ($(PLATFORM), linux)
+else
+
 FILES_java += \
         sun/nio/ch/AbstractPollSelectorImpl.java \
+	sun/nio/ch/DevPollArrayWrapper.java \
+	sun/nio/ch/DevPollSelectorImpl.java \
+        sun/nio/ch/DevPollSelectorProvider.java \
 	sun/nio/ch/EPoll.java \
 	sun/nio/ch/EPollArrayWrapper.java \
 	sun/nio/ch/EPollPort.java \
@@ -197,6 +110,8 @@ FILES_java += \
         sun/nio/ch/PollSelectorImpl.java \
 	sun/nio/ch/Port.java \
 	sun/nio/ch/SimpleAsynchronousFileChannelImpl.java \
+	sun/nio/ch/SolarisAsynchronousChannelProvider.java \
+	sun/nio/ch/SolarisEventPort.java \
 	sun/nio/ch/UnixAsynchronousServerSocketChannelImpl.java \
 	sun/nio/ch/UnixAsynchronousSocketChannelImpl.java \
 	\
@@ -209,6 +124,8 @@ FILES_java += \
 	sun/nio/fs/LinuxNativeDispatcher.java \
 	sun/nio/fs/LinuxWatchService.java \
 	sun/nio/fs/PollingWatchService.java \
+	sun/nio/fs/SolarisNativeDispatcher.java \
+	sun/nio/fs/SolarisWatchService.java \
 	sun/nio/fs/UnixChannelFactory.java \
 	sun/nio/fs/UnixCopyFile.java \
 	sun/nio/fs/UnixDirectoryStream.java \
@@ -228,6 +145,77 @@ FILES_java += \
 	sun/nio/fs/UnixUriUtils.java \
 	sun/nio/fs/UnixUserPrincipals.java
 
+FILES_export += \
+	sun/nio/ch/DevPollArrayWrapper.java \
+	sun/nio/ch/EPoll.java \
+        sun/nio/ch/EPollArrayWrapper.java \
+	sun/nio/ch/EPollPort.java \
+	sun/nio/ch/InheritedChannel.java \
+	sun/nio/ch/NativeThread.java \
+	sun/nio/ch/SolarisEventPort.java \
+	sun/nio/ch/UnixAsynchronousServerSocketChannelImpl.java \
+	sun/nio/ch/UnixAsynchronousSocketChannelImpl.java \
+	\
+	sun/nio/fs/GnomeFileTypeDetector.java \
+	sun/nio/fs/LinuxNativeDispatcher.java \
+	sun/nio/fs/LinuxWatchService.java \
+	sun/nio/fs/SolarisNativeDispatcher.java \
+	sun/nio/fs/SolarisWatchService.java \
+	sun/nio/fs/UnixCopyFile.java \
+	sun/nio/fs/UnixNativeDispatcher.java
+
+FILES_gen += \
+	sun/nio/fs/UnixConstants.java
+
+endif
+
+ifeq ($(PLATFORM), solaris)
+
+FILES_c += \
+        DevPollArrayWrapper.c \
+	InheritedChannel.c \
+	NativeThread.c \
+        PollArrayWrapper.c \
+	SolarisEventPort.c \
+	UnixAsynchronousServerSocketChannelImpl.c \
+	UnixAsynchronousSocketChannelImpl.c \
+	\
+	GnomeFileTypeDetector.c \
+	SolarisNativeDispatcher.c \
+	SolarisWatchService.c \
+	UnixCopyFile.c \
+	UnixNativeDispatcher.c
+
+FILES_java += \
+	sun/nio/ch/EventPortSelectorImpl.java \
+	sun/nio/ch/EventPortSelectorProvider.java \
+	sun/nio/ch/EventPortWrapper.java \
+	sun/nio/fs/SolarisAclFileAttributeView.java \
+	sun/nio/fs/SolarisFileStore.java \
+	sun/nio/fs/SolarisFileSystem.java \
+	sun/nio/fs/SolarisFileSystemProvider.java \
+	sun/nio/fs/SolarisUserDefinedFileAttributeView.java
+
+FILES_gen += \
+	sun/nio/fs/SolarisConstants.java
+
+endif # PLATFORM = solaris
+
+ifeq ($(PLATFORM), windows)
+
+FILES_c += \
+	Iocp.c \
+	RegistryFileTypeDetector.c \
+	WindowsAsynchronousFileChannelImpl.c \
+	WindowsAsynchronousServerSocketChannelImpl.c \
+	WindowsAsynchronousSocketChannelImpl.c \
+	WindowsNativeDispatcher.c \
+        WindowsSelectorImpl.c
+
+endif # PLATFORM = windows
+
+ifeq ($(PLATFORM), linux)
+
 FILES_c += \
 	EPoll.c \
 	EPollArrayWrapper.c \
@@ -244,23 +232,16 @@ FILES_c += \
 	UnixCopyFile.c \
 	UnixNativeDispatcher.c
 
-FILES_export += \
-	sun/nio/ch/EPoll.java \
-        sun/nio/ch/EPollArrayWrapper.java \
-	sun/nio/ch/EPollPort.java \
-	sun/nio/ch/InheritedChannel.java \
-	sun/nio/ch/NativeThread.java \
-	sun/nio/ch/UnixAsynchronousServerSocketChannelImpl.java \
-	sun/nio/ch/UnixAsynchronousSocketChannelImpl.java \
-	\
-	sun/nio/fs/GnomeFileTypeDetector.java \
-	sun/nio/fs/LinuxNativeDispatcher.java \
-	sun/nio/fs/LinuxWatchService.java \
-	sun/nio/fs/UnixCopyFile.java \
-	sun/nio/fs/UnixNativeDispatcher.java
+ifndef USE_SYSTEM_GIO
+FILES_c += \
+	gio_fp.c
+endif
 
-FILES_gen += \
-	sun/nio/fs/UnixConstants.java
+ifndef COMPILE_AGAINST_SYSCALLS
+FILES_c += \
+	syscalls_fp.c
+endif
+
 endif # PLATFORM = linux
 
 ifeq ($(PLATFORM), macosx)
@@ -330,7 +311,7 @@ FILES_export += \
 	sun/nio/fs/BsdNativeDispatcher.java \
 	sun/nio/fs/UnixCopyFile.java \
 	sun/nio/fs/UnixNativeDispatcher.java
-	
+
 FILES_gen += \
 	sun/nio/fs/UnixConstants.java
 endif # PLATFORM = bsd, macosx
@@ -358,6 +339,14 @@ vpath %.c $(SHARE_SRC)/native/sun/nio/ch
 
 endif # PLATFORM = macosx
 
+ifndef USE_SYSTEM_GIO
+  vpath %.c	$(PLATFORM_SRC)/native/common/deps/glib2
+endif
+
+ifndef COMPILE_AGAINST_SYSCALLS
+  vpath %.c	$(PLATFORM_SRC)/native/common/deps
+endif
+
 #
 # Various variables
 #
@@ -382,16 +371,31 @@ ifeq ($(PLATFORM),windows)
      $(OBJDIR)/../../../java.lang/java/$(OBJDIRNAME)/io_util.obj \
      $(OBJDIR)/../../../java.lang/java/$(OBJDIRNAME)/FileDescriptor_md.obj
 endif
+
 ifeq ($(PLATFORM), linux)
-OTHER_LDLIBS += -L$(LIBDIR)/$(LIBARCH) -ljava -lnet -lpthread $(LIBDL)
+  OTHER_LDLIBS += -L$(LIBDIR)/$(LIBARCH) -ljava -lnet -lpthread $(LIBDL)
+  ifdef USE_SYSTEM_GIO
+    OTHER_LDLIBS += $(GIO_LIBS)
+    OTHER_INCLUDES += $(GIO_CFLAGS) -DUSE_SYSTEM_GIO
+  else
+    OTHER_INCLUDES += -I$(PLATFORM_SRC)/native/common/deps/glib2
+  endif
 endif
+
 ifeq ($(PLATFORM), macosx)
 OTHER_LDLIBS += -L$(LIBDIR) -ljava -lnet -pthread -framework CoreFoundation
 endif
+
 ifeq ($(PLATFORM), solaris)
 OTHER_LDLIBS += $(JVMLIB) $(LIBSOCKET) -lposix4 $(LIBDL) -lsendfile \
 		-L$(LIBDIR)/$(LIBARCH) -ljava -lnet
 endif # PLATFORM
+
+ifdef COMPILE_AGAINST_SYSCALLS
+  OTHER_INCLUDES += -DCOMPILE_AGAINST_SYSCALLS
+else
+  OTHER_INCLUDES += -I$(PLATFORM_SRC)/native/common/deps
+endif
 
 #
 # Rules

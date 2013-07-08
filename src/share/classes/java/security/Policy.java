@@ -42,7 +42,6 @@ import sun.security.jca.GetInstance;
 import sun.security.util.Debug;
 import sun.security.util.SecurityConstants;
 
-
 /**
  * A Policy object is responsible for determining whether code executing
  * in the Java runtime environment has permission to perform a

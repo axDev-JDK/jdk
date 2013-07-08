@@ -26,7 +26,7 @@
 #include "splashscreen_impl.h"
 #include "splashscreen_gfx.h"
 
-#include "../giflib/gif_lib.h"
+#include <gif_lib.h>
 
 #include "sizecalc.h"
 
@@ -318,9 +318,18 @@ SplashDecodeGif(Splash * splash, GifFileType * gif)
 int
 SplashDecodeGifStream(Splash * splash, SplashStream * stream)
 {
+#if GIFLIB_MAJOR >= 5
+    int error = 0;
+    GifFileType *gif = DGifOpen((void *) stream, SplashStreamGifInputFunc, &error);
+
+    if (error)
+	return 0;
+#else
     GifFileType *gif = DGifOpen((void *) stream, SplashStreamGifInputFunc);
 
     if (!gif)
         return 0;
+#endif
+
     return SplashDecodeGif(splash, gif);
 }

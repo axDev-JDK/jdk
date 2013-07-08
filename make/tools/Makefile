@@ -28,6 +28,15 @@
 #
 
 BUILDDIR = ..
+
+ifndef JAVAC_MAX_WARNINGS
+  SUBDIRS_MAKEFLAGS += JAVAC_MAX_WARNINGS=true
+endif
+
+ifndef JAVAC_WARNINGS_FATAL
+  SUBDIRS_MAKEFLAGS += JAVAC_WARNINGS_FATAL=true
+endif
+
 include $(BUILDDIR)/common/Defs.gmk
 
 # Note: freetypecheck is built by Sanity.gmk if needed

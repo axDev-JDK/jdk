@@ -2171,7 +2171,6 @@ void unpacker::read_classes() {
 
   method_descr.readData(method_count);
   read_attrs(ATTR_CONTEXT_METHOD, method_count);
-
   CHECK;
 
   read_attrs(ATTR_CONTEXT_CLASS, class_count);

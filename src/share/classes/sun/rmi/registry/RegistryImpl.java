@@ -55,6 +55,7 @@ import sun.rmi.server.UnicastServerRef2;
 import sun.rmi.transport.LiveRef;
 import sun.rmi.transport.ObjectTable;
 import sun.rmi.transport.Target;
+import sun.security.action.GetPropertyAction;
 
 /**
  * A "registry" exists on every node that allows RMI connections to
@@ -334,6 +335,19 @@ public class RegistryImpl extends java.rmi.server.RemoteServer
             }
             URL[] urls = sun.misc.URLClassPath.pathToURLs(envcp);
             ClassLoader cl = new URLClassLoader(urls);
+
+            String codebaseProperty = null;
+            String prop = java.security.AccessController.doPrivileged(
+                new GetPropertyAction("java.rmi.server.codebase"));
+                if (prop != null && prop.trim().length() > 0) {
+                    codebaseProperty = prop;
+                }
+            URL[] codebaseURLs = null;
+            if (codebaseProperty != null) {
+                codebaseURLs = sun.misc.URLClassPath.pathToURLs(codebaseProperty);
+            } else {
+                codebaseURLs = new URL[0];
+            }
 
             /*
              * Fix bugid 4242317: Classes defined by this class loader should
