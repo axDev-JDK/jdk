@@ -451,6 +451,24 @@ if [ "${GIF_LIBS}" = "" ] ; then
 fi
 export GIF_LIBS
 
+# Export variables for system freetype2
+# FT2_CFLAGS and FT2_LIBS tell the compiler how to compile and
+# link against freetype2
+pkgconfig=$(which pkg-config 2>/dev/null)
+if [ -x "${pkgconfig}" ] ; then
+  if [ "${FT2_CFLAGS}" = "" ] ; then
+    FT2_CFLAGS=$("${pkgconfig}" --cflags freetype2)
+  fi
+  if [ "${FT2_LIBS}" = "" ] ; then
+    FT2_LIBS=$("${pkgconfig}" --libs freetype2)
+  fi
+fi
+if [ "${FT2_LIBS}" = "" ] ; then
+    FT2_LIBS="-lfreetype"
+fi
+export FT2_CFLAGS
+export FT2_LIBS
+
 # Setup nss.cfg using location of NSS libraries
 if [ -x "${pkgconfig}" ] ; then
   jdk_topdir=$(dirname ${BASH_SOURCE})/..
@@ -468,3 +486,4 @@ export SYSTEM_ZLIB=true
 export USE_SYSTEM_JPEG=true
 export USE_SYSTEM_PNG=true
 export USE_SYSTEM_GIF=true
+export USE_SYSTEM_FT2=true

@@ -167,7 +167,11 @@ CXXFLAGS     += -DHEADLESS
 ifndef OPENJDK
   CPPFLAGS += -I$(CLOSED_SRC)/share/native/$(PKGDIR)/t2k
 else
-  CPPFLAGS += $(FT2_CFLAGS)
+    ifdef USE_SYSTEM_FT2
+      CPPFLAGS += $(FT2_CFLAGS)
+    else
+      CPPFLAGS += -I$(FREETYPE_HEADERS_PATH) -I$(FREETYPE_HEADERS_PATH)/freetype2
+    endif
 endif
 
 ifeq ($(PLATFORM), windows)
