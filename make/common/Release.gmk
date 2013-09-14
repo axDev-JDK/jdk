@@ -1146,10 +1146,8 @@ initial-image-jdk:: initial-image-jdk-setup \
 	$(CD) $(JDK_IMAGE_DIR)/src && $(ZIPEXE) -qr ../src.zip *
 	$(RM) -r $(JDK_IMAGE_DIR)/src
 	@#
-	@# demo, include
+	@# include
 	@#
-	$(CP) -r -f $(DEMODIR) $(JDK_IMAGE_DIR)
-	$(CP) -r -f $(SAMPLEDIR) $(JDK_IMAGE_DIR)
 	$(CP) -r $(INCLUDEDIR) $(JDK_IMAGE_DIR)
 	@#
 	@# Swing BeanInfo generation
